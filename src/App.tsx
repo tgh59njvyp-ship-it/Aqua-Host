@@ -17,10 +17,11 @@ import {
   Cloud,
   CheckCircle2,
   Lock,
-  UserCheck
+  UserCheck,
+  Terminal
 } from 'lucide-react';
 import { Site, HostedFile, Deployment } from './types';
-import { loadSites, saveSite, deleteSite, createDefaultSite, claimLocalSites } from './utils/storage';
+import { api } from './utils/api';
 import { hashPassword, generateRandomId } from './utils/crypto';
 import { APP_CONFIG } from './config/constants';
 import { TemplateProject } from './utils/templates';
@@ -77,11 +78,11 @@ export default function App() {
       
       // If user just logged in from guest mode, claim any local unowned sites
       if (user && prevUserIdRef.current !== user.uid) {
-        await claimLocalSites(user.uid, user.email || undefined);
+        await api.sites.claimLocal(user.uid, user.email || undefined);
       }
       prevUserIdRef.current = user ? user.uid : null;
 
-      const loaded = await loadSites(user?.uid);
+      const loaded = await api.sites.list(user?.uid);
       setSites(loaded);
       setIsLoading(false);
     };
@@ -133,102 +134,22 @@ export default function App() {
     password?: string;
     files: HostedFile[];
   }) => {
-    const siteId = 'site_' + generateRandomId(8);
-    const depId = 'dep_' + generateRandomId(8);
-    const now = Date.now();
-    const totalBytes = config.files.reduce((acc, f) => acc + f.size, 0);
-
     let passwordHash: string | undefined = undefined;
     if (config.visibility === 'password_protected' && config.password) {
       passwordHash = await hashPassword(config.password);
     }
 
-    const initialDeployment: Deployment = {
-      id: depId,
-      version: 1,
-      status: 'production',
-      createdAt: now,
-      buildTimeMs: Math.floor(Math.random() * 500) + 600,
-      summary: '初回本番デプロイ (Initial Release)',
-      filesCount: config.files.length,
-      totalSize: totalBytes,
-      logs: [
-        `[1/6] ${config.files.length} 個のファイルを解析 & エントリーポイント確認`,
-        `[2/6] 静的アセット最適化を適用 (Cache-Control: public, max-age=31536000)`,
-        `[3/6] エッジストレージ配置完了 (Global Anycast CDN)`,
-        `[4/6] サブドメイン "${config.subdomain}.${APP_CONFIG.defaultDomainSuffix}" を発行`,
-        `[5/6] 自動SSL証明書プロビジョニング完了 (TLS 1.3 / ECC 256-bit)`,
-        `[6/6] デプロイ成功！ サイトが全世界に公開されました`,
-      ],
-      snapshotFiles: JSON.parse(JSON.stringify(config.files)),
-    };
-
-    const newSite: Site = {
-      id: siteId,
-      ownerId: user?.uid,
-      ownerEmail: user?.email || undefined,
+    const newSite = await api.sites.deploy({
       name: config.name,
       subdomain: config.subdomain,
       description: config.description,
-      createdAt: now,
-      updatedAt: now,
-      status: 'active',
-      currentDeploymentId: depId,
-      deployments: [initialDeployment],
+      visibility: config.visibility,
+      password: passwordHash,
       files: config.files,
-      domains: [
-        {
-          domain: `${config.subdomain}.${APP_CONFIG.defaultDomainSuffix}`,
-          status: 'verified',
-          sslStatus: 'active',
-          configuredAt: now,
-          type: 'cname',
-          dnsTarget: APP_CONFIG.dns.cnameTarget,
-        }
-      ],
-      seo: {
-        title: config.name,
-        description: config.description || `${config.name} on ${APP_CONFIG.serviceName}`,
-        keywords: '',
-        canonicalUrl: `https://${config.subdomain}.${APP_CONFIG.defaultDomainSuffix}`,
-        robotsIndex: true,
-        robotsFollow: true,
-        author: '',
-      },
-      ogp: {
-        ogTitle: config.name,
-        ogDescription: config.description,
-        ogImageUrl: '/og-image.jpg',
-        twitterCard: 'summary_large_image',
-      },
-      access: {
-        visibility: config.visibility,
-        passwordHash,
-      },
-      envVars: [],
-      redirects: [],
-      errorPages: {
-        useCustom404: false,
-        theme: 'aquahost_dark',
-        title: '404 - Page Not Found',
-        message: 'お探しのページは見つかりませんでした。',
-      },
-      analytics: {
-        totalViews: 1,
-        uniqueVisitors: 1,
-        dailyViews: [{ date: '今日', views: 1, visitors: 1 }],
-        devices: [{ device: 'Desktop', count: 1 }],
-        browsers: [{ browser: 'Chrome', count: 1 }],
-        referrers: [{ source: 'Direct / Bookmark', count: 1 }],
-        countries: [{ country: 'Japan', code: 'JP', count: 1 }],
-      },
-      rawAnalytics: [],
-      storageBytes: totalBytes,
-      bandwidthBytes: totalBytes,
-    };
+      userId: user?.uid,
+      userEmail: user?.email || undefined,
+    });
 
-    // Save site immediately in state and persistent storage (Firestore + IndexedDB)
-    await saveSite(newSite, user?.uid, user?.email || undefined);
     setSites(prev => [newSite, ...prev]);
 
     // Open deployment progress modal
@@ -254,16 +175,16 @@ export default function App() {
 
   // Update site
   const handleUpdateSite = async (updated: Site) => {
-    await saveSite(updated, user?.uid, user?.email || undefined);
-    setSites(prev => prev.map(s => s.id === updated.id ? updated : s));
-    if (viewerSite?.id === updated.id) {
-      setViewerSite(updated);
+    const saved = await api.sites.update(updated);
+    setSites(prev => prev.map(s => s.id === saved.id ? saved : s));
+    if (viewerSite?.id === saved.id) {
+      setViewerSite(saved);
     }
   };
 
   // Delete site
   const handleDeleteSite = async (siteId: string) => {
-    await deleteSite(siteId);
+    await api.sites.delete(siteId);
     setSites(prev => prev.filter(s => s.id !== siteId));
     setSelectedSiteId(null);
   };
@@ -274,9 +195,9 @@ export default function App() {
       cloned.ownerId = user.uid;
       cloned.ownerEmail = user.email || undefined;
     }
-    await saveSite(cloned, user?.uid, user?.email || undefined);
-    setSites(prev => [cloned, ...prev]);
-    setSelectedSiteId(cloned.id);
+    const saved = await api.sites.update(cloned);
+    setSites(prev => [saved, ...prev]);
+    setSelectedSiteId(saved.id);
   };
 
   // Redeploy trigger from Overview tab
@@ -315,7 +236,6 @@ export default function App() {
 
       {/* Main Content Area */}
       {selectedSiteId && currentSite ? (
-        /* Site Management Dashboard (12 Tabs) */
         <SiteDashboard
           site={currentSite}
           initialTab={dashboardTab}
@@ -378,29 +298,6 @@ export default function App() {
             />
           </section>
 
-          {/* Quick Template Picker Callout Banner */}
-          <section className="rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900/90 via-slate-950 to-slate-900 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">ZIPファイルをお持ちでないですか？</h4>
-                <p className="text-xs text-slate-400">
-                  モダンなポートフォリオやCanvasゲームなど、ワンクリックでデプロイ可能なテンプレートをご用意しています。
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsTemplatesOpen(true)}
-              className="shrink-0 flex items-center gap-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 px-4 py-2.5 text-xs font-semibold text-white border border-slate-700 transition-colors"
-            >
-              <span>テンプレート一覧を見る</span>
-              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            </button>
-          </section>
-
           {/* Hosted Sites List Section */}
           <section className="space-y-6">
             
@@ -454,7 +351,7 @@ export default function App() {
             {isLoading ? (
               <div className="p-12 text-center text-slate-500 text-sm flex items-center justify-center gap-2">
                 <RefreshCw className="h-5 w-5 animate-spin text-cyan-400" />
-                <span>Firestoreおよびローカルストレージからサイトを読み込み中...</span>
+                <span>サイトを読み込み中...</span>
               </div>
             ) : filteredSites.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-slate-800 p-12 text-center space-y-3">
@@ -518,9 +415,7 @@ export default function App() {
           isOpen={!!deployingSiteData}
           siteName={deployingSiteData.siteName}
           subdomain={deployingSiteData.subdomain}
-          onComplete={() => {
-            // Updated in state
-          }}
+          onComplete={() => {}}
           onOpenSite={() => {
             const site = sites.find(s => s.id === deployingSiteData.targetSiteId);
             setDeployingSiteData(null);
@@ -562,9 +457,7 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authModalMode}
-        onSuccess={() => {
-          // Sites will reload through useEffect
-        }}
+        onSuccess={() => {}}
       />
 
     </div>
