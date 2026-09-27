@@ -7,7 +7,9 @@ export const APP_CONFIG = {
   // Service branding
   serviceName: 'AquaHost',
   tagline: 'Instant Web Hosting & Serverless Deployment',
-  taglineJa: 'ドラッグ＆ドロップで即座にWebサイト公開＆管理',
+  taglineJa: 'あなたのサイトを、もっと自由に。',
+  defaultOgImageUrl: '/og-image.jpg',
+  brandLogoUrl: '/og-image.png',
   
   // URL architecture
   defaultDomainSuffix: 'aquahost.app',
@@ -58,6 +60,5 @@ export const APP_CONFIG = {
     md: 'text/markdown; charset=utf-8',
     txt: 'text/plain; charset=utf-8',
     xml: 'application/xml; charset=utf-8',
-    webmanifest: 'application/manifest+json',
   } as Record<string, string>,
 };

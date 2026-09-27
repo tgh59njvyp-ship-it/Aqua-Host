@@ -123,13 +123,29 @@ export const SiteCard: React.FC<SiteCardProps> = ({ site, onManage, onOpenLive }
           </div>
 
           {/* Mini preview content */}
-          <div className="flex flex-col items-center justify-center h-16 text-center text-slate-500 hover:text-slate-400 transition-colors">
-            <Sparkles className="h-4 w-4 text-cyan-400/70 mb-1" />
-            <span className="text-[11px] font-medium text-slate-300 truncate max-w-[200px]">
-              {site.seo?.title || site.name}
-            </span>
-            <span className="text-[9px] text-slate-500">クリックしてプレビューを開く</span>
-          </div>
+          {site.ogp?.ogImageUrl ? (
+            <div className="relative h-16 w-full rounded overflow-hidden">
+              <img
+                src={site.ogp.ogImageUrl}
+                alt="Site Preview"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-1">
+                <span className="text-[10px] font-medium text-white truncate drop-shadow">
+                  {site.seo?.title || site.name}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-16 text-center text-slate-500 hover:text-slate-400 transition-colors">
+              <Sparkles className="h-4 w-4 text-cyan-400/70 mb-1" />
+              <span className="text-[11px] font-medium text-slate-300 truncate max-w-[200px]">
+                {site.seo?.title || site.name}
+              </span>
+              <span className="text-[9px] text-slate-500">クリックしてプレビューを開く</span>
+            </div>
+          )}
         </div>
 
         {/* Description */}

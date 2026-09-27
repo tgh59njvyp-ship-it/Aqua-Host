@@ -198,7 +198,7 @@ export default function App() {
       ogp: {
         ogTitle: config.name,
         ogDescription: config.description,
-        ogImageUrl: '',
+        ogImageUrl: '/og-image.jpg',
         twitterCard: 'summary_large_image',
       },
       access: {

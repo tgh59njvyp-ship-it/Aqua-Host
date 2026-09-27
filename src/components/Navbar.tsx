@@ -89,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 hidden sm:block -mt-0.5 font-medium">
-                Instant Hosting & Cloud Edge
+                {APP_CONFIG.taglineJa}
               </p>
             </div>
           </button>

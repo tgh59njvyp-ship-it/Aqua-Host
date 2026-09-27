@@ -3,19 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AquaHost - Instant Web Hosting & Deployment</title>
+    <title>AquaHost — あなたのサイトを、もっと自由に。| 高速Webホスティング＆デプロイ</title>
     <meta name="description" content="ZIP・HTML・静的ファイルをドラッグ＆ドロップするだけで即座にWebサイトをデプロイ＆公開。オンラインエディタ、アクセス解析、カスタムドメイン対応のホスティングプラットフォーム。" />
-    <meta property="og:title" content="AquaHost - Instant Web Hosting & Deployment" />
-    <meta property="og:description" content="ZIP・HTML・静的ファイルをドラッグ＆ドロップするだけで即座にWebサイトをデプロイ＆公開。オンラインエディタ、アクセス解析、カスタムドメイン対応のホスティングプラットフォーム。" />
+    
+    <!-- Open Graph / Facebook / Discord / Slack -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AquaHost" />
+    <meta property="og:title" content="AquaHost — あなたのサイトを、もっと自由に。" />
+    <meta property="og:description" content="ZIP・HTML・静的ファイルをドラッグ＆ドロップするだけで即座にWebサイトをデプロイ＆公開。オンラインエディタ、アクセス解析、カスタムドメイン対応のホスティングプラットフォーム。" />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AquaHost — あなたのサイトを、もっと自由に。" />
+
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AquaHost — あなたのサイトを、もっと自由に。" />
+    <meta name="twitter:description" content="ZIP・HTML・静的ファイルをドラッグ＆ドロップするだけで即座にWebサイトをデプロイ＆公開。オンラインエディタ、アクセス解析、カスタムドメイン対応。" />
+    <meta name="twitter:image" content="/og-image.jpg" />
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="/og-image.png" />
+    <link rel="apple-touch-icon" href="/og-image.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AquaHost",
+      "headline": "あなたのサイトを、もっと自由に。",
+      "description": "ZIP・HTML・静的ファイルをドラッグ＆ドロップするだけで即座にWebサイトをデプロイ＆公開。オンラインエディタ、アクセス解析、カスタムドメイン対応のホスティングプラットフォーム。",
+      "image": "/og-image.jpg",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "JPY"
+      }
+    }
+    </script>
   </head>
   <body class="bg-[#0b0f17] text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

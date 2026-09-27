@@ -266,9 +266,9 @@ export const HeroUploader: React.FC<HeroUploaderProps> = ({
         
         {/* Title & value prop */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold mb-4 shadow-sm shadow-cyan-500/10">
             <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
-            <span>登録不要・即座にWebサイト公開</span>
+            <span>{APP_CONFIG.taglineJa}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
             ファイルをドロップするだけで、<br className="hidden sm:inline" />

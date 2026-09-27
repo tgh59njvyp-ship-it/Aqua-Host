@@ -207,11 +207,20 @@ export const OgImageTab: React.FC<OgImageTabProps> = ({ site, onUpdateSite }) =>
 
               <button
                 type="button"
+                onClick={() => setOgp(prev => ({ ...prev, ogImageUrl: '/og-image.jpg' }))}
+                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-cyan-500/20 hover:from-sky-500/30 hover:to-cyan-500/30 text-cyan-300 border border-cyan-500/30 px-3.5 py-2 text-xs font-semibold transition-colors"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+                <span>AquaHost 公式OG画像を使用</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleGenerateBanner}
                 className="flex items-center gap-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-3.5 py-2 text-xs font-semibold transition-colors"
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                <span>AI・自動バナー生成 (1200×630)</span>
+                <span>キャンバス自動生成 (1200×630)</span>
               </button>
             </div>
           </div>
@@ -259,20 +268,19 @@ export const OgImageTab: React.FC<OgImageTabProps> = ({ site, onUpdateSite }) =>
 
             {/* Social Card */}
             <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#16181c] transition-all hover:border-slate-700">
-              {ogp.ogImageUrl ? (
-                <div className="relative aspect-[1200/630] w-full bg-slate-900 overflow-hidden">
-                  <img
-                    src={ogp.ogImageUrl}
-                    alt="OG Preview"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center aspect-[1200/630] w-full bg-slate-900/80 text-slate-500 text-xs">
-                  <ImageIcon className="h-8 w-8 mb-2 text-slate-600" />
-                  <span>画像が設定されていません</span>
-                </div>
-              )}
+              <div className="relative aspect-[1200/630] w-full bg-slate-900 overflow-hidden">
+                <img
+                  src={ogp.ogImageUrl || '/og-image.jpg'}
+                  alt="OG Preview"
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+                {!ogp.ogImageUrl && (
+                  <div className="absolute top-2.5 right-2.5 rounded-md bg-slate-950/80 backdrop-blur-sm border border-cyan-500/30 px-2 py-0.5 text-[10px] font-semibold text-cyan-300">
+                    AquaHost 公式デフォルト画像適用中
+                  </div>
+                )}
+              </div>
 
               <div className="p-3">
                 <div className="text-[11px] text-slate-500 truncate">{fullDomain}</div>

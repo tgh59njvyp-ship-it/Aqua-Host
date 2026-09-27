@@ -94,7 +94,7 @@ export function createDefaultSite(ownerId?: string, ownerEmail?: string): Site {
     ogp: {
       ogTitle: 'Kenji Sato — Full Stack Engineer Portfolio',
       ogDescription: 'Designing intuitive digital products & high-performance web systems.',
-      ogImageUrl: '',
+      ogImageUrl: '/og-image.jpg',
       twitterCard: 'summary_large_image',
     },
     access: {
