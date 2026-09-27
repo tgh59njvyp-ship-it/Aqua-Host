@@ -1,0 +1,35 @@
+{
+  "entities": {
+    "sites": {
+      "title": "AquaHost Sites",
+      "description": "Collection of web hosting sites deployed on AquaHost",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "ownerEmail": { "type": "string" },
+        "name": { "type": "string" },
+        "subdomain": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "status": { "type": "string" },
+        "currentDeploymentId": { "type": "string" },
+        "deployments": { "type": "array" },
+        "files": { "type": "array" },
+        "domains": { "type": "array" },
+        "seo": { "type": "object" },
+        "ogp": { "type": "object" },
+        "access": { "type": "object" },
+        "envVars": { "type": "array" },
+        "redirects": { "type": "array" },
+        "errorPages": { "type": "object" },
+        "analytics": { "type": "object" },
+        "rawAnalytics": { "type": "array" },
+        "storageBytes": { "type": "number" },
+        "bandwidthBytes": { "type": "number" }
+      },
+      "required": ["id", "name", "subdomain", "createdAt", "updatedAt", "files"]
+    }
+  }
+}

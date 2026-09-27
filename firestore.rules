@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /sites/{siteId} {
+      // Allow read if site is public, or caller is the owner, or site has no owner
+      allow read: if resource.data.access.visibility == 'public'
+                  || (request.auth != null && resource.data.ownerId == request.auth.uid)
+                  || !('ownerId' in resource.data)
+                  || resource.data.ownerId == null;
+
+      // Allow create: if authenticated, enforce ownerId matches caller's UID. Or allow unassigned guest sites
+      allow create: if (request.auth != null && request.resource.data.ownerId == request.auth.uid)
+                    || (request.auth == null && (!('ownerId' in request.resource.data) || request.resource.data.ownerId == null));
+
+      // Allow update/delete: owner can edit/delete their sites. Unowned sites can be modified or claimed.
+      allow update, delete: if (request.auth != null && (resource.data.ownerId == request.auth.uid || !('ownerId' in resource.data) || resource.data.ownerId == null))
+                           || (request.auth == null && (!('ownerId' in resource.data) || resource.data.ownerId == null));
+    }
+  }
+}

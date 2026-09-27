@@ -1,0 +1,6 @@
+{
+  "name": "AquaHost - Instant Web Hosting & Deployment Platform",
+  "description": "ZIPやHTML・CSS・JSファイルをドラッグ＆ドロップするだけで即座にWebサイトを無料公開。オンラインコードエディタ、カスタムドメイン、SEO/OGP設定、アクセス解析を備えた高速ホスティングサービス。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
